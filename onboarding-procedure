@@ -1,0 +1,24 @@
+* Ubuntu Docker-CE
+sudo apt-get update
+sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce
+-----------------------------------------------------------------------
+
+* Test docker installation
+docker run hello-world
+docker run -d -p 5000:5000 --name registry registry:2
+docker build -t 127.0.0.1:5000/geth .
+docker image ls
+docker push 127.0.0.1:5000/geth
+docker swarm init
+docker network create --driver overlay geth-internal
+docker network ls
+docker service create -d --name consul --network geth-internal consul
+docker service create -d --name=geth -e "user_password=USERPASSWD" -e "is_miner=true" --network geth-internal 127.0.0.1:5000/geth
+docker service create -d --name=geth-remote -e "user_password=USERPASSWORD" -e "is_miner=true" -p 8545:8545 -p 30303:30303 --mode global --network geth-internal 127.0.0.1:5000/geth
+sudo netstat -anp | egrep "30303.*LISTEN|8545.*LISTEN"
