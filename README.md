@@ -1,2 +1,2 @@
-# Ethichain
-Ethichain
+# Fairchain
+Fairchain
